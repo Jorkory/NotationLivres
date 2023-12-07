@@ -64,3 +64,18 @@ exports.deleteBook = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error }));
 }
+
+exports.addRating = (req, res, next) => {
+    const ratingObject = req.body;
+    delete ratingObject.userId;
+    Book.findOne({ _id: req.params.id })
+        .then((book) => {
+            const rating = { grade: ratingObject.rating, userId: req.auth.userId }
+            console.log(rating)
+            book.ratings.push(rating)
+            book.save()
+                .then(() => res.status(201).json(book))
+                .catch(error => res.status(400).json({ error }))
+        })
+        .catch(error => res.status(500).json({ error }));
+};
