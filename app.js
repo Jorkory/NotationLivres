@@ -26,11 +26,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', userRoutes);
 app.use('/api/books', bookRoutes);
 
-app.get('/api/books', (req, res, next) => {
-    Book.find()
-        .then(books => res.status(200).json(books))
-        .catch(error => res.status(400).json({ error }));
-});
+
 
 // app.use((req, res) => {
 //     res.json({ message: 'Serveur connecté !' })
