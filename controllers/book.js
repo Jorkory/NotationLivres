@@ -7,13 +7,17 @@ exports.getAllBooks = (req, res, next) => {
 };
 
 exports.addBook = (req, res, next) => {
-    // delete req.body._id;
+    const bookObject = JSON.parse(req.body.book);
+    delete bookObject._id;
+    delete bookObject.userId;
     const book = new Book({
-        ...req.body
+        ...bookObject,
+        userId: req.auth.userId,
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
-    console.log({ book });
-    // book.save()
-    //     .then(() => res.status(201).json({ message: 'livre enregistré !' }))
-    //     .cath(error => res.status(400).json({ error }));
+
+    book.save()
+        .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
+        .catch(error => res.status(400).json({ error }))
 }
 
