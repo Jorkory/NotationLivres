@@ -42,32 +42,39 @@ exports.addBook = (req, res, next) => {
 }
 
 exports.updateBook = (req, res, next) => {
-    console.log(req.body)
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.filename}`
     } : { ...req.body };
     delete bookObject.userId;
-    const bookKeys = Object.values(bookObject);
-    const result = bookKeys.every(value => value.trim().length > 0);
-    console.log(bookKeys + '  ' + result)
-    Book.findOne({ _id: req.params.id })
+    Book.findById(req.params.id)
         .then(book => {
-            if (book.userId != req.auth.userId) {
-                res.status(403).json({ message: 'Unauthorized request !' })
+            book.title = bookObject.title;  //Vérifier si les nouvelles entrées sont respectées aux critiques du Schema
+            book.author = bookObject.author;    //***
+            book.year = bookObject.year;    //***
+            book.genre = bookObject.genre;  //***
+            if (book.validateSync()) {
+                const err = new error(book.validateSync())
+                res.status(400).json({ err })
             } else {
-                const filename = book.imageUrl.split('/images/')[1];
-                req.file && fs.unlink(`images/${filename}`);
-                Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
-                    .then(() => res.status(200).json({ message: 'Livre modifié !' }))
-                    .catch(error => res.status(401).json({ error }));
+                if (book.userId != req.auth.userId) {
+                    res.status(403).json({ message: 'Unauthorized request !' })
+                } else {
+                    if (req.file) {
+                        const filename = book.imageUrl.split('/images/')[1];
+                        fs.unlink(`images/${filename}`);
+                    }
+                    Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+                        .then(() => res.status(200).json({ message: 'Livre modifié !' }))
+                        .catch(error => res.status(401).json({ error }));
+                }
             }
         })
         .catch(error => res.status(400).json({ error }))
 }
 
 exports.deleteBook = (req, res, next) => {
-    Book.findOne({ _id: req.params.id })
+    Book.findById(req.params.id)
         .then(book => {
             if (book.userId != req.auth.userId) {
                 res.status(403).json({ message: 'Unauthorized request !' });
@@ -85,7 +92,7 @@ exports.deleteBook = (req, res, next) => {
 
 exports.addRating = (req, res, next) => {
     if (req.body.rating >= 0 && req.body.rating <= 5) {
-        Book.findOne({ _id: req.params.id })
+        Book.findById(req.params.id)
             .then((book) => {
                 const rating = { grade: req.body.rating, userId: req.auth.userId };
                 book.ratings.push(rating);
