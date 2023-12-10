@@ -32,13 +32,15 @@ exports.addBook = (req, res, next) => {
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.filename}`,
+        imageUrl: req.file && `${req.protocol}://${req.get('host')}/images/${req.filename}`,
     });
     book.ratings[0].userId = req.auth.userId;
-    console.log(book)
     book.save()
         .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
-        .catch(error => res.status(400).json({ error }))
+        .catch(error => {
+            req.file && fs.unlinkSync(`images/${req.filename}`);
+            res.status(400).json({ error })
+        });
 }
 
 exports.updateBook = (req, res, next) => {
@@ -65,7 +67,6 @@ exports.updateBook = (req, res, next) => {
                             if (req.file) {
                                 try {
                                     const filename = book.imageUrl.split('/images/')[1];
-                                    console.log(filename)
                                     fs.unlinkSync(`images/${filename}`);
                                 } catch {
                                     console.log("Fichier n'existe pas, abandon !");
@@ -111,7 +112,7 @@ exports.addRating = (req, res, next) => {
             .catch(error => res.status(500).json({ error }));
     } else {
         const err = new Error('Not authorized!');
-        res.status(400).json({ err });
+        res.status(400).json({ message: err });
     }
 };
 
