@@ -63,9 +63,13 @@ exports.updateBook = (req, res, next) => {
                     Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
                         .then(() => {
                             if (req.file) {
-                                const filename = book.imageUrl.split('/images/')[1];
-                                console.log(filename)
-                                fs.unlinkSync(`images/${filename}`);
+                                try {
+                                    const filename = book.imageUrl.split('/images/')[1];
+                                    console.log(filename)
+                                    fs.unlinkSync(`images/${filename}`);
+                                } catch {
+                                    console.log("Fichier n'existe pas, abandon !");
+                                }
                             };
                             res.status(200).json({ message: 'Livre modifié !' })
                         })
