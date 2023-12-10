@@ -8,7 +8,7 @@ function updateAverageRating(book) {
         (accumulator, currentValue) => accumulator + currentValue
     );
     const averageRating = globalRating / arrayRatings.length;
-    return book.averageRating = Math.round(averageRating);
+    return book.averageRating = averageRating.toFixed(1);
 }
 
 
