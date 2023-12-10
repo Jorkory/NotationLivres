@@ -25,7 +25,6 @@ exports.getOneBook = (req, res, next) => {
 };
 
 exports.addBook = (req, res, next) => {
-    console.log(req.filename);
     const bookObject = JSON.parse(req.body.book);
     delete bookObject._id;
     delete bookObject.userId;
