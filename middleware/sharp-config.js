@@ -8,8 +8,7 @@ module.exports = (req, res, next) => {
             .resize({
                 width: 404,
                 height: 568,
-                fit: sharp.fit.contain,
-                background: { r: 255, g: 255, b: 255 }
+                fit: sharp.fit.cover,
             })
             .toFile(`./images/` + req.filename)
             .then(() => next())
