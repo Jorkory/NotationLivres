@@ -56,7 +56,7 @@ exports.updateBook = (req, res, next) => {
             book.year = bookObject.year;    //***
             book.genre = bookObject.genre;  //***
             if (book.validateSync()) {
-                const err = new error(book.validateSync())
+                const err = new Error(book.validateSync())
                 res.status(400).json({ err })
             } else {
                 if (book.userId != req.auth.userId) {
