@@ -3,12 +3,12 @@ Formation OpenClassrooms
 
 ## Installation des dépendances :
 ```bash
-npm install
+npm install -force
 ```
 
 ## Lancement du serveur :
 ```bash
-npm start -force
+npm start
 ```
 
 ## Informations importantes :
