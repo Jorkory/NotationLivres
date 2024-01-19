@@ -8,7 +8,7 @@ npm install
 
 ## Lancement du serveur :
 ```bash
-npm start
+npm start -force
 ```
 
 ## Informations importantes :
