@@ -1,14 +1,33 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const dotenv = require('dotenv');
 const userRoutes = require('./routes/user');
 const bookRoutes = require('./routes/book');
 const path = require('path');
 
+const limiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 100,
+    message: 'Trop de requêtes depuis cette adresse IP, veuillez réessayer plus tard.',
+})
+
+dotenv.config();
+
 const app = express();
 
+
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
+app.use(limiter);
 app.use(express.json());
 
-mongoose.connect('mongodb+srv://jorkory:MLafu6qeMmWUcPdq@atlascluster.z7gp1ht.mongodb.net/?retryWrites=true&w=majority',
+const mongoURI = process.env.MONGODB_URI || '';
+
+mongoose.connect(mongoURI,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -17,7 +36,7 @@ mongoose.connect('mongodb+srv://jorkory:MLafu6qeMmWUcPdq@atlascluster.z7gp1ht.mo
     .catch(() => console.log('Connexion à MongoDB échoué !'));
 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();

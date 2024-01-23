@@ -1,7 +1,13 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv')
 
 const User = require('../models/User')
+
+dotenv.config();
+
+const round = Number(process.env.ROUND_NBR);
+const tokenSecret = process.env.TOKEN_SECRET;
 
 exports.signup = (req, res, next) => {
     const email = req.body.email.toLowerCase()
@@ -10,7 +16,8 @@ exports.signup = (req, res, next) => {
         const err = new Error("Ce mot de passe n'est pas un mot de passe valide! Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre, un caractère spécial et doit être d'au moins 8 caractères.")
         res.status(400).json({ err });
     } else {
-        bcrypt.hash(req.body.password, 10)
+        console.log(typeof (round))
+        bcrypt.hash(req.body.password, round)
             .then(hash => {
                 const user = new User({
                     email: email,
@@ -40,7 +47,7 @@ exports.login = (req, res, next) => {
                                 userId: user._id,
                                 token: jwt.sign(
                                     { userId: user._id },
-                                    'RANDOM_TOKEN_SECRET',
+                                    tokenSecret,
                                     { expiresIn: '24h' }
                                 )
                             });

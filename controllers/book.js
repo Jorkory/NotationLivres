@@ -98,6 +98,15 @@ exports.addRating = (req, res, next) => {
     if (req.body.rating >= 0 && req.body.rating <= 5) {
         Book.findById(req.params.id)
             .then((book) => {
+                let userAlreadyRated = false;
+                book.ratings.map(rating => {
+                    if (req.auth.userId === rating.userId) {
+                        userAlreadyRated = true;
+                    }
+                })
+                if (userAlreadyRated) {
+                    return res.status(400).json({ error: "L'utilisateur a déjà noté ce livre." });
+                }
                 const rating = { grade: req.body.rating, userId: req.auth.userId };
                 book.ratings.push(rating);
                 updateAverageRating(book);
