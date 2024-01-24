@@ -57,6 +57,7 @@ exports.addBook = async (req, res, next) => {
         const validationError = await book.validateSync();
 
         if (validationError) {
+            req.file && fs.unlinkSync(`images/${req.filename}`);
             return res.status(httpStatus.BAD_REQUEST).json({ error: "Erreur de la validation." })
         }
 
