@@ -60,6 +60,7 @@ exports.updateBook = (req, res, next) => {
                 res.status(400).json({ err })
             } else {
                 if (book.userId != req.auth.userId) {
+                    req.file && fs.unlinkSync(`images/${req.filename}`);
                     res.status(403).json({ message: 'Unauthorized request !' })
                 } else {
                     Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })

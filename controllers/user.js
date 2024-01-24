@@ -11,12 +11,11 @@ const tokenSecret = process.env.TOKEN_SECRET;
 
 exports.signup = (req, res, next) => {
     const email = req.body.email.toLowerCase()
-    const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/gm);
+    const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/gm);
     if (!regex.test(req.body.password)) {
         const err = new Error("Ce mot de passe n'est pas un mot de passe valide! Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre, un caractère spécial et doit être d'au moins 8 caractères.")
         res.status(400).json({ err });
     } else {
-        console.log(typeof (round))
         bcrypt.hash(req.body.password, round)
             .then(hash => {
                 const user = new User({
