@@ -1,4 +1,5 @@
 const sharp = require('sharp');
+const httpStatus = require('http-status');
 
 module.exports = (req, res, next) => {
     if (req.file) {
@@ -13,10 +14,10 @@ module.exports = (req, res, next) => {
                 })
                 .toFile(`./images/` + req.filename)
                 .then(() => next())
-                .catch(error => res.status(500).json({ error }));
+                .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) });
         } catch {
             const err = new Error("Le fichier téléchargé n'est pas conforme.");
-            res.status(400).json({ err });
+            return res.status(httpStatus.BAD_REQUEST).json({ err });
         }
     } else {
         next();

@@ -1,4 +1,5 @@
 const Book = require('../models/Book');
+const httpStatus = require('http-status');
 const fs = require('fs');
 
 
@@ -14,14 +15,14 @@ function updateAverageRating(book) {
 
 exports.getAllBooks = (req, res, next) => {
     Book.find()
-        .then(books => res.status(200).json(books))
-        .catch(error => res.status(400).json({ error }));
+        .then(books => { return res.status(httpStatus.OK).json(books) })
+        .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) });
 };
 
 exports.getOneBook = (req, res, next) => {
     Book.findById(req.params.id)
-        .then(book => res.status(200).json(book))
-        .catch(error => res.status(400).json({ error }))
+        .then(book => { return res.status(httpStatus.OK).json(book) })
+        .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) })
 };
 
 exports.addBook = (req, res, next) => {
@@ -36,10 +37,10 @@ exports.addBook = (req, res, next) => {
     });
     book.ratings[0].userId = req.auth.userId;
     book.save()
-        .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
+        .then(() => { return res.status(httpStatus.CREATED).json({ message: 'Livre enregistré !' }) })
         .catch(error => {
             req.file && fs.unlinkSync(`images/${req.filename}`);
-            res.status(400).json({ error })
+            return res.status(httpStatus.BAD_REQUEST).json({ error })
         });
 }
 
@@ -57,11 +58,11 @@ exports.updateBook = (req, res, next) => {
             book.genre = bookObject.genre;  //***
             if (book.validateSync()) {
                 const err = new Error(book.validateSync())
-                res.status(400).json({ err })
+                return res.status(httpStatus.BAD_REQUEST).json({ err })
             } else {
                 if (book.userId != req.auth.userId) {
                     req.file && fs.unlinkSync(`images/${req.filename}`);
-                    res.status(403).json({ message: 'Unauthorized request !' })
+                    return res.status(httpStatus.FORBIDDEN).json({ message: 'Unauthorized request !' })
                 } else {
                     Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
                         .then(() => {
@@ -69,30 +70,30 @@ exports.updateBook = (req, res, next) => {
                                 const filename = book.imageUrl.split('/images/')[1];
                                 fs.unlinkSync(`images/${filename}`);
                             };
-                            res.status(200).json({ message: 'Livre modifié !' })
+                            return res.status(httpStatus.OK).json({ message: 'Livre modifié !' })
                         })
-                        .catch(error => res.status(401).json({ error }));
+                        .catch(error => { return res.status(httpStatus.FORBIDDEN).json({ error }) });
                 }
             }
         })
-        .catch(error => res.status(400).json({ error }))
+        .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) })
 }
 
 exports.deleteBook = (req, res, next) => {
     Book.findById(req.params.id)
         .then(book => {
             if (book.userId != req.auth.userId) {
-                res.status(403).json({ message: 'Unauthorized request !' });
+                return res.status(httpStatus.FORBIDDEN).json({ message: 'Unauthorized request !' });
             } else {
                 const filename = book.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     Book.deleteOne({ _id: req.params.id })
-                        .then(() => res.status(200).json({ message: 'Livre supprimé !' }))
-                        .catch(error => res.status(401).json({ error }))
+                        .then(() => { return res.status(httpStatus.OK).json({ message: 'Livre supprimé !' }) })
+                        .catch(error => { return res.status(httpStatus.FORBIDDEN).json({ error }) })
                 })
             }
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) });
 }
 
 exports.addRating = (req, res, next) => {
@@ -106,19 +107,19 @@ exports.addRating = (req, res, next) => {
                     }
                 })
                 if (userAlreadyRated) {
-                    return res.status(400).json({ error: "L'utilisateur a déjà noté ce livre." });
+                    return res.status(httpStatus.FORBIDDEN).json({ error: "L'utilisateur a déjà noté ce livre." });
                 }
                 const rating = { grade: req.body.rating, userId: req.auth.userId };
                 book.ratings.push(rating);
                 updateAverageRating(book);
                 book.save()
-                    .then(() => { res.status(201).json(book) })
-                    .catch(error => res.status(400).json({ error }))
+                    .then(() => { return res.status(httpStatus.CREATED).json(book) })
+                    .catch(error => { return res.status(httpStatus.BAD_REQUEST).json({ error }) })
             })
-            .catch(error => res.status(500).json({ error }));
+            .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) });
     } else {
         const err = new Error('Not authorized!');
-        res.status(400).json({ message: err });
+        return res.status(httpStatus.BAD_REQUEST).json({ message: err });
     }
 };
 
@@ -127,7 +128,7 @@ exports.bestRating = (req, res, next) => {
         .sort({ averageRating: -1 })
         .limit(3)
         .then(books => {
-            res.status(200).json(books);
+            return res.status(httpStatus.OK).json(books);
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) });
 }
