@@ -3,7 +3,11 @@ const httpStatus = require('http-status');
 const fs = require('fs');
 const { error } = require('console');
 
-
+/**
+ * Mise à jour la note moyenne d'un livre
+ * @param {object} book Objet du livre.
+ * @returns {object} Objet du livre avec la note moyenne mise à jour.
+ */
 function updateAverageRating(book) {
     const arrayRatings = book.ratings.map(rating => rating.grade);
     const globalRating = arrayRatings.reduce(
@@ -13,8 +17,14 @@ function updateAverageRating(book) {
     return book.averageRating = averageRating.toFixed(1);
 }
 
-
-exports.getAllBooks = async (req, res, next) => {
+/**
+ * Obtient tous les livres.
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant un tableau des livres.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.getAllBooks = async (req, res) => {
     try {
         const books = await Book.find();
 
@@ -24,7 +34,14 @@ exports.getAllBooks = async (req, res, next) => {
     }
 }
 
-exports.getOneBook = async (req, res, next) => {
+/**
+ * Obtient un livre en fonction de l'ID fourni en paramètre.
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant l'objet du livre.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.getOneBook = async (req, res) => {
     try {
         const book = await Book.findById(req.params.id);
 
@@ -38,7 +55,14 @@ exports.getOneBook = async (req, res, next) => {
     }
 }
 
-exports.addBook = async (req, res, next) => {
+/**
+ * Ajoute un nouveau livre.
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant le message de la confirmation.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.addBook = async (req, res) => {
     try {
         const bookObject = await JSON.parse(req.body.book);
 
@@ -70,7 +94,14 @@ exports.addBook = async (req, res, next) => {
     }
 }
 
-exports.updateBook = async (req, res, next) => {
+/**
+ * Modifie les informations du livre existant.
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant le message de la confirmation.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.updateBook = async (req, res) => {
 
     try {
         const bookObject = req.file ? {
@@ -112,7 +143,14 @@ exports.updateBook = async (req, res, next) => {
     }
 }
 
-exports.deleteBook = async (req, res, next) => {
+/**
+ * Supprime un livre.
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant le message de la confirmation.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.deleteBook = async (req, res) => {
     try {
         const book = await Book.findById(req.params.id);
 
@@ -140,8 +178,14 @@ exports.deleteBook = async (req, res, next) => {
     }
 }
 
-
-exports.addRating = async (req, res, next) => {
+/**
+ * Ajoute une note (autres utilisateurs et max 1 seule fois).
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant l'objet du livre'.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.addRating = async (req, res) => {
     try {
         if (!Number.isInteger(req.body.rating) || req.body.rating < 0 || req.body.rating > 5) {
             return res.status(httpStatus.BAD_REQUEST).json({ error: "Le rating doit être compris entre 0 et 5." });
@@ -173,8 +217,14 @@ exports.addRating = async (req, res, next) => {
     }
 }
 
-
-exports.bestRating = async (req, res, next) => {
+/**
+ * Selectionne 3 livres contenant les meilleures notes.
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant un tableau des 3 livres.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.bestRating = async (req, res) => {
     try {
         const bestBooks = await Book.find()
             .sort({ averageRating: -1 })

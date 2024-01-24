@@ -10,7 +10,14 @@ dotenv.config();
 const round = Number(process.env.ROUND_NBR);
 const tokenSecret = process.env.TOKEN_SECRET;
 
-exports.signup = async (req, res, next) => {
+/**
+ * Crée un nouveau compte utilisateur.
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} - Réponse JSON contenant le message de confirmation que le compte est bien créé.
+ * @throws {object} - Réponse JSON en cas d'erreur.
+ */
+exports.signup = async (req, res) => {
     try {
         const email = req.body.email.toLowerCase()
         const regex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/gm);
@@ -41,7 +48,14 @@ exports.signup = async (req, res, next) => {
     }
 }
 
-exports.login = async (req, res, next) => {
+/**
+ * Se connecter à un compte
+ * @param {express.Request} req Objet de requête Express.
+ * @param {express.Response} res Objet de réponse Express.
+ * @returns {object} Réponse JSON contenant l'identifiant d'utilisateur et son jeton JWT.
+ * @throws {object} Réponse JSON en cas d'erreur.
+ */
+exports.login = async (req, res) => {
     try {
         const email = req.body.email.toLowerCase();
 

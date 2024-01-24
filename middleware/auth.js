@@ -6,6 +6,14 @@ dotenv.config();
 
 const tokenSecret = process.env.TOKEN_SECRET;
 
+/**
+ * Vérifie si le jeton JWT est toujours validé.
+ * @param {Express.Request} req Objet de requête Express.
+ * @param {Express.Response} res Objet de réponse Express.
+ * @param {function} next La fonction next du middleware.
+ * @returns {function} Middleware suivant si le jeton est valide.
+ * @throws {object} Réponse JSON en cas de jeton invalide.
+ */
 module.exports = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
