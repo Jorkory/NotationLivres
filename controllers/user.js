@@ -20,23 +20,24 @@ exports.signup = async (req, res, next) => {
             return res.status(httpStatus.BAD_REQUEST).json({ err });
         }
 
-        let hash;
-        try {
-            hash = await bcrypt.hash(req.body.password, round);
-        } catch (hashError) {
-            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ hashError });
-        }
+        const hash = await bcrypt.hash(req.body.password, round);
 
         const user = new User({
             email: email,
             password: hash
         });
 
+        const validationError = await user.validateSync();
+
+        if (validationError) {
+            return res.status(httpStatus.BAD_REQUEST).json({ error: "Erreur de la validation." })
+        }
+
         await user.save();
 
         return res.status(httpStatus.CREATED).json({ message: 'compte crée' });
     } catch {
-        return res.status(httpStatus.BAD_REQUEST).json({ error: 'Erreur lors de la création du compte' });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Erreur lors de la création du compte' });
     }
 }
 
