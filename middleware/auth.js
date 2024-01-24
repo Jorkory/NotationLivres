@@ -17,6 +17,6 @@ module.exports = (req, res, next) => {
         next();
     }
     catch (error) {
-        return res.status(httpStatus.UNAUTHORIZED).json({ error });
+        return res.status(httpStatus.UNAUTHORIZED).json({ error: "Non autorisé !" });
     }
 };

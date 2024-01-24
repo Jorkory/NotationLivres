@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
                 .catch(error => { return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error }) });
         } catch {
             const err = new Error("Le fichier téléchargé n'est pas conforme.");
-            return res.status(httpStatus.BAD_REQUEST).json({ err });
+            return res.status(httpStatus.BAD_REQUEST).json({ error: "Mauvais requete" });
         }
     } else {
         next();

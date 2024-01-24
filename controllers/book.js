@@ -20,7 +20,7 @@ exports.getAllBooks = async (req, res, next) => {
 
         return res.status(httpStatus.OK).json(books);
     } catch (error) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }
 
@@ -34,7 +34,7 @@ exports.getOneBook = async (req, res, next) => {
 
         return res.status(httpStatus.OK).json(book);
     } catch (error) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }
 
@@ -66,7 +66,7 @@ exports.addBook = async (req, res, next) => {
         return res.status(httpStatus.CREATED).json({ message: 'Livre enregistré !' });
     } catch (error) {
         req.file && fs.unlinkSync(`images/${req.filename}`);
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }
 
@@ -108,7 +108,7 @@ exports.updateBook = async (req, res, next) => {
         return res.status(httpStatus.OK).json({ message: 'Livre modifié !' });
     } catch {
         req.file && fs.unlinkSync(`images/${req.filename}`);
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur lors de la mise à jour du livre" });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }
 
@@ -136,7 +136,7 @@ exports.deleteBook = async (req, res, next) => {
 
         return res.status(httpStatus.OK).json({ message: 'Livre supprimé !' })
     } catch (error) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error })
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" })
     }
 }
 
@@ -169,7 +169,7 @@ exports.addRating = async (req, res, next) => {
 
         return res.status(httpStatus.CREATED).json(book);
     } catch (error) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }
 
@@ -182,6 +182,6 @@ exports.bestRating = async (req, res, next) => {
 
         return res.status(httpStatus.OK).json(bestBooks);
     } catch (error) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }

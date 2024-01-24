@@ -37,7 +37,7 @@ exports.signup = async (req, res, next) => {
 
         return res.status(httpStatus.CREATED).json({ message: 'compte crée' });
     } catch {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Erreur lors de la création du compte' });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }
 
@@ -64,6 +64,6 @@ exports.login = async (req, res, next) => {
             token: token
         });
     } catch (error) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: "Erreur interne du serveur" });
     }
 }
